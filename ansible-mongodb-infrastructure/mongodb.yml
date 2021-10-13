@@ -1,0 +1,38 @@
+
+- name: Playbook for MongoDB infrastructure initialization
+  gather_facts: false
+  hosts: localhost
+  serial: 1
+  remote_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    do_token: ""
+    do_region: "nyc3"
+    do_ssh_key: "unixway-keypair"
+
+  tasks:
+    - name: Gather information about DigitalOcean SSH keys
+      community.digitalocean.digital_ocean_sshkey_info:
+        oauth_token: "{{ do_token }}"
+      register: ssh_keys
+
+    - name: Set facts based on the gathered information
+      set_fact:
+        do_ssh_key_id: "{{ item.id }}"
+      loop: "{{ ssh_keys.data | community.general.json_query(query) }}"
+      vars:
+        query: "[?name=='{{ do_ssh_key }}']"
+
+    - name: "Setup vpc for MongoDB cluster {{ cluster_name }}"
+      include_role:
+         name: vpc
+      vars:
+        vpc_name: "unixway-vpc"
+
+    - name: "Install server infrastructure for MongoDB cluster {{ cluster_name }}"
+      include_role:
+         name: servers
+      vars:
+        vpc_name: "unixway-vpc"
+        cluster_name: "uw-m1"
+        replica_sets_data_total: 2

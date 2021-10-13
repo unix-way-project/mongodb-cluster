@@ -1,5 +1,5 @@
 
-- name: Playbook for MongoDB infrastructure initialization
+- name: Playbook for MongoDB service initialization
   gather_facts: true
   hosts: all
   serial: 10

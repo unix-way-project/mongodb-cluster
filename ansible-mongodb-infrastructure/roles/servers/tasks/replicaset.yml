@@ -1,0 +1,22 @@
+
+
+- name: "Create replicaset {{ replica_set_name }}"
+  digital_ocean_droplet:
+    name: "{{ cluster_name }}-{{ replica_set_name }}-{{ node_index }}"
+    oauth_token: "{{ do_token }}"
+    size: "{{ replica_set_size }}"
+    vpc_uuid: "{{ vpc_uuid }}"
+    region: "{{ do_region }}"
+    image: "debian-10-x64"
+    wait_timeout: 600
+    unique_name: yes
+    ssh_keys: ["{{ do_ssh_key_id }}"]
+    state: absent
+  with_sequence: start=0 count={{ replica_set_count }}
+  loop_control:
+    loop_var: node_index
+  register: result
+
+- name: "Store metadata for replicaset {{ replica_set_name }}"
+  set_fact:
+    unixway_mongodb: "{{ unixway_mongodb | combine( { replica_set_category: { replica_set_name: result.results | community.general.json_query('[].{name: data.droplet.name, ip_public: data.droplet.networks.v4[? type == `public`] | [0].ip_address }') } }, recursive = true) }}"

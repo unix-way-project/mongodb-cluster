@@ -17,7 +17,6 @@ resource "digitalocean_droplet" "nodes" {
     image = "debian-10-x64"
     region = var.do_region
     size = var.replica_set_size
-    private_networking = true
     ssh_keys = [
       var.ssh_key_id
     ]

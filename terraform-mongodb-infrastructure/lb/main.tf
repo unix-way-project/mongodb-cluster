@@ -17,7 +17,6 @@ resource "digitalocean_droplet" "load_balancer" {
     image = "debian-10-x64"
     region = var.do_region
     size = var.load_balancer_size
-    private_networking = true
     ssh_keys = [
       var.ssh_key_id
     ]

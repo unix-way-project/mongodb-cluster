@@ -1,0 +1,16 @@
+
+- name: "Gather information about VPC {{ vpc_name }}"
+  community.digitalocean.digital_ocean_vpc_info:
+    oauth_token: "{{ do_token }}"
+    members: false
+  register: vpcs
+
+- name: "Set fact with vpc_uuid value for VPC {{ vpc_name }}"
+  set_fact:
+    servers_vpc_uuid: "{{ vpcs.data | community.general.json_query(query) }}"
+  vars:
+    query: "[? name == '{{ vpc_name }}'] | [0].id"
+
+- name: "VPC Id for {{ vpc_name }} is {{ servers_vpc_uuid }}"
+  debug:
+    var: servers_vpc_uuid

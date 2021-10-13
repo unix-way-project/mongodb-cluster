@@ -1,0 +1,31 @@
+
+- set_fact:
+    unixway_mongodb: {}
+
+- name: Initialize config replicaset
+  include_tasks: "replicaset.yml"
+  vars:
+    replica_set_category: 'rs_cfg'
+    replica_set_name: "cfg"
+    replica_set_size: "s-1vcpu-1gb"
+    replica_set_count: 3
+
+- name: Initialize data replicasets
+  include_tasks: "replicaset.yml"
+  vars:
+    replica_set_category: 'rs_data'
+    replica_set_name: "rs{{ replicaset_index }}"
+    replica_set_size: "s-1vcpu-1gb"
+    replica_set_count: 3
+  with_sequence: start=0 count={{ replica_sets_data_total }}
+  loop_control:
+    loop_var: replicaset_index
+
+- name: "Output cluster metadata"
+  debug:
+    msg: "{{ unixway_mongodb }}"
+
+- name: Create inventory file
+  template:
+    src: inventory.tpl
+    dest: inventory.ini

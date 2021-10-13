@@ -1,0 +1,8 @@
+
+- name: Create a VPC for MongoDB Cluster
+  community.digitalocean.digital_ocean_vpc:
+    oauth_token: "{{ do_token }}"
+    state: present
+    name: "{{ vpc_name }}"
+    region: "{{ do_region }}"
+    ip_range: "10.0.0.0/24"

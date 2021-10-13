@@ -1,0 +1,8 @@
+
+- name: Gather information about VPC
+  include_tasks: "vpc.yml"
+
+- name: Initialize MongoDB clusters
+  include_tasks: "cluster.yml"
+  vars:
+    vpc_uuid: servers_vpc_uuid
